@@ -1,19 +1,21 @@
 package hexlet.code;
 
+import java.util.Optional;
+
 public class StringSchema {
 
     private String containedSubstring;
     private int minStringLength;
-    private boolean requiredToBeStringInstance;
+    private boolean required;
 
     public StringSchema() {
         containedSubstring = "";
         minStringLength = 0;
-        requiredToBeStringInstance = false;
+        required = false;
     }
 
     public void required() {
-        this.requiredToBeStringInstance = true;
+        this.required = true;
     }
 
     public StringSchema minLength(int minStringLength) {
@@ -26,17 +28,24 @@ public class StringSchema {
         return this;
     }
 
-    public boolean isValid(String checkString) {
-        if (requiredToBeStringInstance) {
-            if (checkString != null
-                && checkString.length() > minStringLength
-                && checkString.contains(containedSubstring)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+    public boolean isValid(String testedString) {
+        Optional<String> testedValue = Optional.ofNullable(testedString);
 
-        return true;
+        if (required) {
+            return isRequired(testedValue.get());
+        } else {
+            return isNotRequired(testedValue.get());
+        }
+    }
+
+    private boolean isRequired(String testedString) {
+        return testedString != null
+                && testedString.length() > minStringLength
+                && testedString.contains(containedSubstring);
+    }
+
+    private boolean isNotRequired(String testedString) {
+        return testedString.length() >= minStringLength
+                && testedString.contains(containedSubstring);
     }
 }
