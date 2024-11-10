@@ -1,25 +1,18 @@
 package hexlet.code;
 
-import java.util.Optional;
+public class NumberSchema extends BaseSchema<Integer>{
 
-public class NumberSchema {
-
-    private boolean required;
-    private boolean numberMustBePositive;
+    private boolean positive;
     private Integer minBound = Integer.MIN_VALUE;
     private Integer maxBound = Integer.MAX_VALUE;
 
     public NumberSchema() {
-        required = false;
-        numberMustBePositive = false;
-    }
-
-    public void required() {
-        this.required = true;
+        super();
+        positive = false;
     }
 
     public NumberSchema positive() {
-        this.numberMustBePositive = true;
+        this.positive = true;
         return this;
     }
 
@@ -29,16 +22,8 @@ public class NumberSchema {
         return this;
     }
 
-    public boolean isValid(Integer testedNumber) {
-        if (required) {
-            return isRequired(testedNumber);
-        } else {
-            return isNotRequired(testedNumber);
-        }
-    }
-
-    private boolean isRequired(Integer testedNumber) {
-        if (numberMustBePositive) {
+    boolean isRequired(Integer testedNumber) {
+        if (positive) {
             return testedNumber != null
                     && isNumberPositive(testedNumber)
                     && isNumberFitsInRange(testedNumber);
@@ -48,12 +33,12 @@ public class NumberSchema {
         }
     }
 
-    private boolean isNotRequired(Integer testedNumber) {
+    boolean isNotRequired(Integer testedNumber) {
         if (testedNumber == null) {
             return true;
         }
 
-        if (numberMustBePositive) {
+        if (positive) {
             return isNumberPositive(testedNumber)
                     && isNumberFitsInRange(testedNumber);
         } else {
