@@ -9,7 +9,6 @@ public class StringSchema extends BaseSchema<String>{
         super();
         substring = "";
         minLength = 0;
-        //required = false;
     }
 
     public StringSchema minLength(int minStringLength) {
@@ -22,18 +21,20 @@ public class StringSchema extends BaseSchema<String>{
         return this;
     }
 
-    boolean isRequired(String testedString) {
-        return testedString != null
-                && testedString.length() > minLength
-                && testedString.contains(substring);
+    @Override
+    boolean isRequired(String testedValue) {
+        return testedValue != null
+                && testedValue.length() > minLength
+                && testedValue.contains(substring);
     }
 
-    boolean isNotRequired(String testedString) {
-        if (testedString == null) {
+    @Override
+    boolean isNotRequired(String testedValue) {
+        if (testedValue == null) {
             return true;
         }
 
-        return testedString.length() >= minLength
-                && testedString.contains(substring);
+        return testedValue.length() >= minLength
+                && testedValue.contains(substring);
     }
 }

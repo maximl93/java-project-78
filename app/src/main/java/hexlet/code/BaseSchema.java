@@ -13,18 +13,18 @@ abstract class BaseSchema<T> {
         return (V) this; // ???
     }
 
-    public boolean isValid(T checkedValue) {
+    public boolean isValid(T testedValue) {
         if (required) {
-            return isRequired(checkedValue);
+            return isRequired(testedValue);
         } else {
-            return isNotRequired(checkedValue);
+            return isNotRequired(testedValue);
         }
     }
 
     /*
     Абстрактные методы, которые будут переопределены так как у StringSchema и NumberSchema разная логика проверки
      */
-    abstract boolean isRequired(T checkedValue);
+    abstract boolean isRequired(T testedValue);
 
-    abstract boolean isNotRequired(T checkedValue);
+    abstract boolean isNotRequired(T testedValue);
 }

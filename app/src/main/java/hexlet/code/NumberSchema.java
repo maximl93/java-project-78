@@ -22,36 +22,38 @@ public class NumberSchema extends BaseSchema<Integer>{
         return this;
     }
 
-    boolean isRequired(Integer testedNumber) {
+    @Override
+    boolean isRequired(Integer testedValue) {
         if (positive) {
-            return testedNumber != null
-                    && isNumberPositive(testedNumber)
-                    && isNumberFitsInRange(testedNumber);
+            return testedValue != null
+                    && isNumberPositive(testedValue)
+                    && isNumberFitsInRange(testedValue);
         } else {
-            return testedNumber != null
-                    && isNumberFitsInRange(testedNumber);
+            return testedValue != null
+                    && isNumberFitsInRange(testedValue);
         }
     }
 
-    boolean isNotRequired(Integer testedNumber) {
-        if (testedNumber == null) {
+    @Override
+    boolean isNotRequired(Integer testedValue) {
+        if (testedValue == null) {
             return true;
         }
 
         if (positive) {
-            return isNumberPositive(testedNumber)
-                    && isNumberFitsInRange(testedNumber);
+            return isNumberPositive(testedValue)
+                    && isNumberFitsInRange(testedValue);
         } else {
-            return isNumberFitsInRange(testedNumber);
+            return isNumberFitsInRange(testedValue);
         }
     }
 
-    private boolean isNumberFitsInRange(Integer testedNumber) {
-        return testedNumber > minBound
-                && testedNumber < maxBound;
+    private boolean isNumberFitsInRange(Integer testedValue) {
+        return testedValue > minBound
+                && testedValue < maxBound;
     }
 
-    private boolean isNumberPositive(Integer testedNumber) {
-        return testedNumber > 0;
+    private boolean isNumberPositive(Integer testedValue) {
+        return testedValue > 0;
     }
 }
