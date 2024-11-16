@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class StringSchemaTest {
+public final class StringSchemaTest {
 
     private StringSchema stringSchema;
     private final String testingString1 = "3rd project";
