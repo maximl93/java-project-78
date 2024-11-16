@@ -1,59 +1,27 @@
 package hexlet.code.schemas;
 
-public class NumberSchema extends BaseSchema<Integer>{
+import java.util.Objects;
 
-    private boolean positive;
-    private Integer minBound = Integer.MIN_VALUE;
-    private Integer maxBound = Integer.MAX_VALUE;
+public class NumberSchema extends BaseSchema<Integer> {
 
-    public NumberSchema() {
-        super();
-        positive = false;
+    public NumberSchema required() {
+        addRule("required",
+                Objects::nonNull);
+
+        return this;
     }
 
     public NumberSchema positive() {
-        this.positive = true;
+        addRule("positive",
+                value -> value == null || value > 0);
+
         return this;
     }
 
-    public NumberSchema range(int minBound, int maxBound) {
-        this.minBound = minBound;
-        this.maxBound = maxBound;
+    public NumberSchema range(int min, int max) {
+        addRule("range",
+                value -> value == null || (value >= min && value <= max));
+
         return this;
-    }
-
-    @Override
-    boolean isRequired(Integer testedValue) {
-        if (positive) {
-            return testedValue != null
-                    && isNumberPositive(testedValue)
-                    && isNumberFitsInRange(testedValue);
-        } else {
-            return testedValue != null
-                    && isNumberFitsInRange(testedValue);
-        }
-    }
-
-    @Override
-    boolean isNotRequired(Integer testedValue) {
-        if (testedValue == null) {
-            return true;
-        }
-
-        if (positive) {
-            return isNumberPositive(testedValue)
-                    && isNumberFitsInRange(testedValue);
-        } else {
-            return isNumberFitsInRange(testedValue);
-        }
-    }
-
-    private boolean isNumberFitsInRange(Integer testedValue) {
-        return testedValue > minBound
-                && testedValue < maxBound;
-    }
-
-    private boolean isNumberPositive(Integer testedValue) {
-        return testedValue > 0;
     }
 }

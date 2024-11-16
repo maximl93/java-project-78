@@ -23,6 +23,7 @@ public class StringSchemaTest {
     public void stringNotRequiredTest() {
         assertTrue(stringSchema.isValid(""));
         assertTrue(stringSchema.isValid(null));
+        assertTrue(stringSchema.isValid(TESTING_STRING_1));
     }
 
     @Test

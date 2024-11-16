@@ -1,30 +1,21 @@
 package hexlet.code.schemas;
 
-public abstract class BaseSchema<T> {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Predicate;
 
-    public boolean required;
+public class BaseSchema<T> {
 
-    public BaseSchema() {
-        this.required = false;
-    }
 
-    public <V extends BaseSchema<T>> V required() { // обобщенный метод возвращает экземпляр дочернего класса
-        this.required = true;
-        return (V) this; // ???
+    private Map<String, Predicate<T>> schemeRules = new HashMap<>();
+
+    public void addRule(String rule, Predicate<T> ruleLogic) {
+        schemeRules.put(rule, ruleLogic);
     }
 
     public boolean isValid(T testedValue) {
-        if (required) {
-            return isRequired(testedValue);
-        } else {
-            return isNotRequired(testedValue);
-        }
+        return schemeRules.values()
+                .stream()
+                .allMatch(predicate -> predicate.test(testedValue));
     }
-
-    /*
-    Абстрактные методы, которые будут переопределены так как у StringSchema и NumberSchema разная логика проверки
-     */
-    abstract boolean isRequired(T testedValue);
-
-    abstract boolean isNotRequired(T testedValue);
 }

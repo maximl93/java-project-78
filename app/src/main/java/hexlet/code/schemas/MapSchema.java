@@ -1,60 +1,36 @@
 package hexlet.code.schemas;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Objects;
 
-public class MapSchema extends BaseSchema<Map<?, ?>>{
+public class MapSchema extends BaseSchema<Map> {
 
-    private int sizeOfMap;
-    private Map<String, BaseSchema<?>> schemas;
+    public MapSchema required() {
+        addRule("required",
+                Objects::nonNull);
 
-    public MapSchema() {
-        super();
-        this.sizeOfMap = 0;
-        schemas = new HashMap<>();
-    }
-
-    @Override
-    boolean isRequired(Map<?, ?> testedValue) {
-        return testedValue != null && isMapTheExactSize(testedValue);
-    }
-
-    @Override
-    boolean isNotRequired(Map<?, ?> testedValue) {
-        if (testedValue == null) {
-            return true;
-        }
-
-        return isMapTheExactSize(testedValue);
-    }
-
-    public MapSchema sizeof(int newSize) {
-        this.sizeOfMap = newSize;
         return this;
     }
 
-    private boolean isMapTheExactSize(Map<?, ?> testedValue) {
-        return testedValue.size() >= sizeOfMap;
-    }
+    public MapSchema sizeof(int size) {
+        addRule("sizeof",
+                value -> value == null || value.size() >= size);
 
-    public MapSchema shape(Map<String, BaseSchema<?>> schemas) {
-        this.schemas.putAll(schemas);
         return this;
     }
-    /*
-    не понимаю как произвести проверку значений мапы согласно настроенной схемы
-     */
-    private boolean isPassedAllConditions(Map<?, ?> testedValue) {
-        AtomicBoolean passed = new AtomicBoolean(true);
 
-        testedValue.forEach((key, value) -> {
-            BaseSchema<?> temp = schemas.get(key);
-            if (!temp.isValid(value)) {
-                passed.set(false);
-            }
-        });
+    public <T> MapSchema shape(Map<String, BaseSchema<T>> schemas) {
+        addRule("schemas",
+                value -> schemas.entrySet().stream().allMatch(entry -> {
+                    String key = entry.getKey();
+                    BaseSchema<T> schema = entry.getValue();
+                    if (value.containsKey(key)) {
+                        return schema.isValid((T) value.get(key));
+                    } else {
+                        return true;
+                    }
+                }));
 
-        return passed.get();
+        return this;
     }
 }

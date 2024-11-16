@@ -21,13 +21,13 @@ public class NumberSchemaTest {
         numberSchema = validator.number();
     }
 
-   @Test
-   public void numberNotRequiredTest() {
-       assertTrue(numberSchema.isValid(TESTING_POSITIVE));
-       assertTrue(numberSchema.isValid(null));
-       assertTrue(numberSchema.positive().isValid(TESTING_POSITIVE));
-       assertTrue(numberSchema.isValid(null));
-   }
+    @Test
+    public void numberNotRequiredTest() {
+        assertTrue(numberSchema.isValid(TESTING_POSITIVE));
+        assertTrue(numberSchema.isValid(null));
+        assertTrue(numberSchema.positive().isValid(TESTING_POSITIVE));
+        assertTrue(numberSchema.isValid(null));
+    }
 
     @Test
     public void numberRequiredTest() {
