@@ -9,11 +9,11 @@ public abstract class BaseSchema<T> {
 
     private Map<String, Predicate<T>> schemeRules = new HashMap<>();
 
-    protected void addRule(String rule, Predicate<T> ruleLogic) {
+    protected final void addRule(String rule, Predicate<T> ruleLogic) {
         schemeRules.put(rule, ruleLogic);
     }
 
-    public boolean isValid(T testedValue) {
+    public final boolean isValid(T testedValue) {
         return schemeRules.values()
                 .stream()
                 .allMatch(predicate -> predicate.test(testedValue));
