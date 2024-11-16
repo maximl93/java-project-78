@@ -75,7 +75,7 @@ public class MapSchemaTest {
     @Test
     public void shapeTestPassed2() {
         Map<String, BaseSchema<Integer>> schemas = new HashMap<>();
-        schemas.put("age", validator.number().required().range(10,30));
+        schemas.put("age", validator.number().required().range(10, 30));
         schemas.put("year", validator.number().required().positive());
 
         mapSchema.shape(schemas);
@@ -105,7 +105,7 @@ public class MapSchemaTest {
     @Test
     public void shapeTestFailed2() {
         Map<String, BaseSchema<Integer>> schemas = new HashMap<>();
-        schemas.put("age", validator.number().required().range(10,30));
+        schemas.put("age", validator.number().required().range(10, 30));
         schemas.put("year", validator.number().required().positive());
 
         mapSchema.shape(schemas);
