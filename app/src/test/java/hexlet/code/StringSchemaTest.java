@@ -3,6 +3,9 @@ package hexlet.code;
 import hexlet.code.schemas.StringSchema;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,48 +23,64 @@ public final class StringSchemaTest {
         stringSchema = validator.string();
     }
 
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"3rd project", "hexlet", ""})
+    public void stringNotRequiredTest(String testingValue) {
+        assertTrue(stringSchema.isValid(testingValue));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"3rd project", "hexlet", "a"})
+    public void stringRequiredPassTest(String testingValue) {
+        stringSchema.required();
+
+        assertTrue(stringSchema.isValid(testingValue));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {""})
+    public void stringRequiredFailTest(String testingValue) {
+        stringSchema.required();
+
+        assertFalse(stringSchema.isValid(testingValue));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"3rd project", "hexlet"})
+    public void minLengthStringPassTest(String testingValue) {
+        stringSchema.required().minLength(6);
+
+        assertTrue(stringSchema.isValid(testingValue));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"a", "hex", "hexle"})
+    public void minLengthStringFailTest(String testingValue) {
+        stringSchema.required().minLength(6);
+
+        assertFalse(stringSchema.isValid(testingValue));
+    }
+
     @Test
-    public void stringNotRequiredTest() {
-        assertTrue(stringSchema.isValid(""));
-        assertTrue(stringSchema.isValid(null));
+    public void containsSubstringPassTest() {
+        stringSchema.required().contains("3rd");
+
         assertTrue(stringSchema.isValid(testingString1));
     }
 
     @Test
-    public void stringRequiredTest() {
-        stringSchema.required();
+    public void containsSubstringFailTest() {
+        stringSchema.required().contains("hax");
 
-        assertTrue(stringSchema.isValid(testingString1));
-        assertFalse(stringSchema.isValid(null));
-        assertFalse(stringSchema.isValid(""));
-    }
-
-    @Test
-    public void minLengthStringTest() {
-        assertTrue(stringSchema.minLength(6).isValid(testingString1));
-
-        stringSchema.required();
-
-        assertTrue(stringSchema.minLength(7).isValid(testingString1));
         assertFalse(stringSchema.isValid(testingString2));
-        assertTrue(stringSchema.minLength(3).isValid(testingString2));
-    }
-
-    @Test
-    public void containsSubstringTest() {
-        assertTrue(stringSchema.contains("3rd").isValid(testingString1));
-
-        stringSchema.required();
-
-        assertTrue(stringSchema.isValid(testingString1));
-        assertFalse(stringSchema.contains("4th").isValid(testingString1));
     }
 
     @Test
     public void changeParamInOneChainTest() {
-        stringSchema.required();
+        stringSchema.required().minLength(8).contains("hex").minLength(3);
 
-        assertTrue(stringSchema.minLength(8).contains("hex").minLength(3).isValid(testingString2));
-        assertFalse(stringSchema.contains("project").contains("app").isValid(testingString1));
+        assertTrue(stringSchema.isValid(testingString2));
     }
 }

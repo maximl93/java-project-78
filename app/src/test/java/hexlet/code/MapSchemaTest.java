@@ -17,38 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class MapSchemaTest {
 
-    private Validator validator = new Validator();
+    private final Validator validator = new Validator();
     private MapSchema mapSchema;
-    private Map<String, String> emptyMap = new HashMap<>();
-    private Map<String, String> testingMap = new HashMap<>(Map.of("key", "value"));
 
     @BeforeEach
     public void beforeEach() {
         mapSchema = validator.map();
-    }
-
-    @Test
-    public void mapNotRequiredTest() {
-        assertTrue(mapSchema.isValid(null));
-        assertTrue(mapSchema.isValid(emptyMap));
-        assertTrue(mapSchema.isValid(testingMap));
-    }
-
-    @Test
-    public void mapRequiredTest() {
-        mapSchema.required();
-
-        assertTrue(mapSchema.isValid(emptyMap));
-        assertTrue(mapSchema.isValid(testingMap));
-        assertFalse(mapSchema.isValid(null));
-    }
-
-    @Test
-    public void mapSizeOfTest1() {
-        mapSchema.required().sizeof(1);
-
-        assertTrue(mapSchema.isValid(testingMap));
-        assertFalse(mapSchema.isValid(emptyMap));
     }
 
     private static Stream<Map<String, Object>> testMapProvider() {
@@ -61,10 +35,46 @@ public final class MapSchemaTest {
     @ParameterizedTest
     @NullSource
     @MethodSource("testMapProvider")
-    public void mapSizeOfTest2(Map<String, Object> testedMap) {
+    public void mapNotRequiredTest(Map<String, Object> testedMap) {
+        assertTrue(mapSchema.isValid(testedMap));
+    }
+
+    @ParameterizedTest
+    @MethodSource("testMapProvider")
+    public void mapRequiredPassTest(Map<String, Object> testedMap) {
+        mapSchema.required();
+
+        assertTrue(mapSchema.isValid(testedMap));
+    }
+
+    @Test
+    public void mapRequiredFailTest() {
+        mapSchema.required();
+
+        assertFalse(mapSchema.isValid(null));
+    }
+
+    @Test
+    public void mapSizeOfPassTest() {
+        Map<String, String> testingMap = new HashMap<>(Map.of("key", "value"));
+
+        mapSchema.required().sizeof(1);
+
+        assertTrue(mapSchema.isValid(testingMap));
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @MethodSource("testMapProvider")
+    public void mapSizeOfFailTest(Map<String, Object> testedMap) {
         mapSchema.required().sizeof(2);
 
         assertFalse(mapSchema.isValid(testedMap));
+    }
+
+    private Map<String, BaseSchema<String>> stringSchemasProvider() {
+        return Map.of("firstName", validator.string().required().contains("Maks"),
+                "lastName", validator.string().required().minLength(5));
     }
 
     @Test
@@ -72,25 +82,8 @@ public final class MapSchemaTest {
         Map<String, String> testedMap = new HashMap<>();
         testedMap.put("firstName", "Maksim");
         testedMap.put("lastName", "Lukin");
-        Map<String, BaseSchema<String>> schemas = new HashMap<>();
-        schemas.put("firstName", validator.string().required());
-        schemas.put("lastName", validator.string().required().minLength(2));
 
-        mapSchema.shape(schemas);
-
-        assertTrue(mapSchema.isValid(testedMap));
-    }
-
-    @Test
-    public void shapeTestPassed2() {
-        Map<String, Integer> testedMap = new HashMap<>();
-        testedMap.put("age", 20);
-        testedMap.put("year", 2000);
-        Map<String, BaseSchema<Integer>> schemas = new HashMap<>();
-        schemas.put("age", validator.number().required().range(10, 30));
-        schemas.put("year", validator.number().required().positive());
-
-        mapSchema.shape(schemas);
+        mapSchema.shape(stringSchemasProvider());
 
         assertTrue(mapSchema.isValid(testedMap));
     }
@@ -98,15 +91,28 @@ public final class MapSchemaTest {
     @Test
     public void shapeTestFailed1() {
         Map<String, String> testedMap = new HashMap<>();
-        testedMap.put("firstName", "Maksim");
-        testedMap.put("lastName", null);
-        Map<String, BaseSchema<String>> schemas = new HashMap<>();
-        schemas.put("firstName", validator.string().required());
-        schemas.put("lastName", validator.string().required());
+        testedMap.put("firstName", "Maxim");
+        testedMap.put("lastName", "Luk");
 
-        mapSchema.shape(schemas);
+        mapSchema.shape(stringSchemasProvider());
 
         assertFalse(mapSchema.isValid(testedMap));
+    }
+
+    private Map<String, BaseSchema<Integer>> numberSchemasProvider() {
+        return Map.of("age", validator.number().required().range(10, 30),
+                "year", validator.number().required().positive());
+    }
+
+    @Test
+    public void shapeTestPassed2() {
+        Map<String, Integer> testedMap = new HashMap<>();
+        testedMap.put("age", 20);
+        testedMap.put("year", 2000);
+
+        mapSchema.shape(numberSchemasProvider());
+
+        assertTrue(mapSchema.isValid(testedMap));
     }
 
     @Test
@@ -114,11 +120,8 @@ public final class MapSchemaTest {
         Map<String, Integer> testedMap = new HashMap<>();
         testedMap.put("age", 20);
         testedMap.put("year", -10);
-        Map<String, BaseSchema<Integer>> schemas = new HashMap<>();
-        schemas.put("age", validator.number().required().range(10, 30));
-        schemas.put("year", validator.number().required().positive());
 
-        mapSchema.shape(schemas);
+        mapSchema.shape(numberSchemasProvider());
 
         assertFalse(mapSchema.isValid(testedMap));
     }
